@@ -19,11 +19,11 @@ const scripts = () => {
 
 const build = series(static, scripts);
 
-exports.default = cb => {
-  watch(["src/**/*.ts", "src/**/*.json"], build);
-  cb();
-};
 exports.clean = clean;
 exports.static = series(clean, static);
 exports.scripts = series(clean, scripts);
 exports.build = build;
+exports.default = series(build, cb => {
+  watch(["src/**/*.ts", "src/**/*.json"], build);
+  cb();
+});
