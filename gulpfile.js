@@ -1,28 +1,29 @@
-const gulp = require('gulp');
-const clean = require('gulp-clean');
-const ts = require('gulp-typescript');
+const gulp = require("gulp");
+const { series, src, dest, watch } = require("gulp");
+const del = require("del");
+const ts = require("gulp-typescript");
 
-const tsProject = ts.createProject('tsconfig.json');
+const tsProject = ts.createProject("tsconfig.json");
 
-gulp.task('scripts', ['static'], () => {
-  return tsProject
+const clean = () => del("dist");
+
+const static = () => src(["src/**/*.json"]).pipe(gulp.dest("dist"));
+
+const scripts = () => {
+  return ts
+    .createProject("tsconfig.json")
     .src()
-    .pipe(tsProject())
-    .js.pipe(gulp.dest('dist'));
-});
+    .pipe(ts.createProject("tsconfig.json")())
+    .js.pipe(dest("dist"));
+};
 
-gulp.task('static', ['clean'], () => {
-  return gulp.src(['src/**/*.json']).pipe(gulp.dest('dist'));
-});
+const build = series(static, scripts);
 
-gulp.task('clean', () => {
-  return gulp.src('dist').pipe(clean());
-});
-
-gulp.task('build', ['scripts']);
-
-gulp.task('watch', ['build'], () => {
-  return gulp.watch(['src/**/*.ts', 'src/**/*.json'], ['build']);
-});
-
-gulp.task('default', ['watch']);
+exports.default = cb => {
+  watch(["src/**/*.ts", "src/**/*.json"], build);
+  cb();
+};
+exports.clean = clean;
+exports.static = series(clean, static);
+exports.scripts = series(clean, scripts);
+exports.build = build;
