@@ -8,7 +8,7 @@ export const postResolvers = {
       const { db }: { db: DbConnection } = context;
       return db.User.findById(parent.get("author"));
     },
-    coments: (parent, args, context, info) => {
+    comments: (parent, args, context, info) => {
       const { first = 10, offset = 0 } = args;
       const { db }: { db: DbConnection } = context;
       return db.Comment.findAll({
